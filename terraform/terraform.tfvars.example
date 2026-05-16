@@ -1,0 +1,12 @@
+# Copy this file to terraform.tfvars and fill in your values.
+# terraform.tfvars is git-ignored — never commit secrets.
+#
+# Export your DO token as an env var instead of putting it here:
+#   export TF_VAR_do_token="dop_v1_..."
+
+region       = "nyc3"
+cluster_name = "sre-capstone"
+k8s_version  = "1.31"
+node_size    = "s-2vcpu-4gb"
+node_count   = 2
+db_name      = "ecommerce"
