@@ -6,9 +6,7 @@ resource "digitalocean_vpc" "main" {
 }
 
 # ── Kubernetes cluster (DOKS) ─────────────────────────────────────────────────
-data "digitalocean_kubernetes_versions" "available" {
-  version_prefix = "${var.k8s_version}."
-}
+data "digitalocean_kubernetes_versions" "available" {}
 
 resource "digitalocean_kubernetes_cluster" "main" {
   name     = var.cluster_name
@@ -30,30 +28,4 @@ resource "digitalocean_kubernetes_cluster" "main" {
   tags = ["sre-capstone", "kubernetes"]
 }
 
-# ── Managed PostgreSQL ────────────────────────────────────────────────────────
-resource "digitalocean_database_cluster" "postgres" {
-  name       = "${var.cluster_name}-db"
-  engine     = "pg"
-  version    = "15"
-  size       = "db-s-1vcpu-1gb"
-  region     = var.region
-  node_count = 1
-  private_network_uuid = digitalocean_vpc.main.id
-
-  tags = ["sre-capstone", "postgres"]
-}
-
-resource "digitalocean_database_db" "ecommerce" {
-  cluster_id = digitalocean_database_cluster.postgres.id
-  name       = var.db_name
-}
-
-# Allow only cluster nodes to reach the database.
-resource "digitalocean_database_firewall" "postgres" {
-  cluster_id = digitalocean_database_cluster.postgres.id
-
-  rule {
-    type  = "k8s"
-    value = digitalocean_kubernetes_cluster.main.id
-  }
-}
+# PostgreSQL runs inside the cluster (see k8s/postgres.yaml)

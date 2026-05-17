@@ -4,7 +4,7 @@
 # Export your DO token as an env var instead of putting it here:
 #   export TF_VAR_do_token="dop_v1_..."
 
-region       = "nyc3"
+region       = "ams3"
 cluster_name = "sre-capstone"
 k8s_version  = "1.31"
 node_size    = "s-2vcpu-4gb"

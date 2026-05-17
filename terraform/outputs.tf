@@ -14,29 +14,3 @@ output "kubeconfig" {
   sensitive   = true
 }
 
-output "db_host" {
-  description = "Private hostname of the managed PostgreSQL cluster."
-  value       = digitalocean_database_cluster.postgres.private_host
-}
-
-output "db_port" {
-  description = "PostgreSQL port."
-  value       = digitalocean_database_cluster.postgres.port
-}
-
-output "db_user" {
-  description = "Default database user."
-  value       = digitalocean_database_cluster.postgres.user
-}
-
-output "db_password" {
-  description = "Default database password."
-  value       = digitalocean_database_cluster.postgres.password
-  sensitive   = true
-}
-
-output "db_uri" {
-  description = "Full PostgreSQL connection URI (private network)."
-  value       = digitalocean_database_cluster.postgres.private_uri
-  sensitive   = true
-}

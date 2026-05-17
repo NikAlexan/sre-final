@@ -15,7 +15,7 @@ terraform {
   # Then run: terraform init
   backend "s3" {
     endpoints = {
-      s3 = "https://nyc3.digitaloceanspaces.com"
+      s3 = "https://ams3.digitaloceanspaces.com"
     }
     bucket = "sre-capstone-tfstate"
     key    = "terraform.tfstate"
@@ -24,10 +24,11 @@ terraform {
     # Credentials are read automatically from env vars:
     #   export AWS_ACCESS_KEY_ID="<spaces_access_key>"
     #   export AWS_SECRET_ACCESS_KEY="<spaces_secret_key>"
-    skip_credentials_validation = true
-    skip_metadata_api_check     = true
-    skip_region_validation      = true
-    force_path_style            = true
+    skip_credentials_validation  = true
+    skip_metadata_api_check      = true
+    skip_region_validation       = true
+    skip_requesting_account_id   = true
+    use_path_style               = true
   }
 }
 

@@ -7,7 +7,7 @@ variable "do_token" {
 variable "region" {
   description = "DigitalOcean region slug."
   type        = string
-  default     = "nyc3"
+  default     = "ams3"
 }
 
 variable "cluster_name" {
@@ -25,7 +25,7 @@ variable "k8s_version" {
 variable "node_size" {
   description = "Droplet size for Kubernetes worker nodes."
   type        = string
-  default     = "s-2vcpu-4gb"
+  default     = "s-1vcpu-2gb"
 }
 
 variable "node_count" {

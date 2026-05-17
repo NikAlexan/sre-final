@@ -6,3 +6,4 @@ terraform/terraform.tfstate
 terraform/terraform.tfstate.backup
 terraform/*.tfplan
 Final.pdf
+terraform/.env
