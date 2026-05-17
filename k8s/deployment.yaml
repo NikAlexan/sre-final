@@ -19,20 +19,22 @@ spec:
           ports:
             - containerPort: 8080
           env:
-            - name: PRESTASHOP_DATABASE_HOST
+            - name: DB_SERVER
               value: postgres
-            - name: PRESTASHOP_DATABASE_PORT_NUMBER
+            - name: DB_PORT
               value: "5432"
-            - name: PRESTASHOP_DATABASE_NAME
+            - name: DB_NAME
               value: ecommerce
-            - name: PRESTASHOP_DATABASE_USER
+            - name: DB_USER
               value: prestashop
-            - name: PRESTASHOP_DATABASE_PASSWORD
+            - name: DB_PASSWD
               valueFrom:
                 secretKeyRef:
                   name: prestashop-secret
                   key: db-password
-            - name: PRESTASHOP_PASSWORD
+            - name: PS_FOLDER_ADMIN
+              value: admin1
+            - name: ADMIN_PASSWD
               valueFrom:
                 secretKeyRef:
                   name: prestashop-secret
