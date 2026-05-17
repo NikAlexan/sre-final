@@ -2,7 +2,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: fooddelivery-sli-dashboard
-  namespace: monitoring
+  namespace: kube-prometheus-stack
   labels:
     grafana_dashboard: "1"
 data:
