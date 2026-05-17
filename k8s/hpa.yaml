@@ -32,6 +32,10 @@ spec:
           periodSeconds: 60
     scaleUp:
       stabilizationWindowSeconds: 0
+      policies:
+        - type: Pods
+          value: 2
+          periodSeconds: 60
 ---
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
@@ -67,6 +71,10 @@ spec:
           periodSeconds: 60
     scaleUp:
       stabilizationWindowSeconds: 0
+      policies:
+        - type: Pods
+          value: 1
+          periodSeconds: 60
 ---
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
@@ -102,6 +110,10 @@ spec:
           periodSeconds: 60
     scaleUp:
       stabilizationWindowSeconds: 0
+      policies:
+        - type: Pods
+          value: 1
+          periodSeconds: 60
 ---
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
@@ -137,6 +149,10 @@ spec:
           periodSeconds: 60
     scaleUp:
       stabilizationWindowSeconds: 0
+      policies:
+        - type: Pods
+          value: 1
+          periodSeconds: 60
 ---
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
@@ -172,6 +188,10 @@ spec:
           periodSeconds: 60
     scaleUp:
       stabilizationWindowSeconds: 0
+      policies:
+        - type: Pods
+          value: 1
+          periodSeconds: 60
 ---
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
@@ -207,3 +227,7 @@ spec:
           periodSeconds: 60
     scaleUp:
       stabilizationWindowSeconds: 0
+      policies:
+        - type: Pods
+          value: 1
+          periodSeconds: 60

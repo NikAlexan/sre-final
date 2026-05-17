@@ -1,0 +1,185 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: fooddelivery-slo-recording-rules
+  namespace: fooddelivery
+  labels:
+    release: kube-prometheus-stack
+    app: fooddelivery
+spec:
+  groups:
+    # ──────────────────────────────────────────────────────────────────────────
+    # SLO 1 — Availability ≥ 99%
+    #   SLI: fraction of desired replicas that are available, averaged across
+    #        all Deployments in the fooddelivery namespace.
+    # ──────────────────────────────────────────────────────────────────────────
+    - name: fooddelivery.slo.availability
+      interval: 30s
+      rules:
+        # Instantaneous availability ratio (0–1)
+        - record: job:fooddelivery_availability:ratio
+          expr: |
+            avg(
+              kube_deployment_status_replicas_available{namespace="fooddelivery"}
+              / kube_deployment_spec_replicas{namespace="fooddelivery"}
+            )
+
+        # 5-minute rolling average — used by dashboards and alert evaluation
+        - record: job:fooddelivery_availability_5m:ratio
+          expr: |
+            avg_over_time(job:fooddelivery_availability:ratio[5m])
+
+        # 30-minute rolling average — used for SLO burn-rate calculations
+        - record: job:fooddelivery_availability_30m:ratio
+          expr: |
+            avg_over_time(job:fooddelivery_availability:ratio[30m])
+
+        # Per-deployment availability — used in the Grafana gauge panel
+        - record: job:fooddelivery_availability_per_deployment:ratio
+          expr: |
+            kube_deployment_status_replicas_available{namespace="fooddelivery"}
+            / kube_deployment_spec_replicas{namespace="fooddelivery"}
+
+        # Alert: SLO burn rate too high (fast burn — 1h window, 14× budget consumed)
+        - alert: FoodDeliverySLOFastBurn
+          expr: |
+            (1 - job:fooddelivery_availability_5m:ratio) > (14 * (1 - 0.99))
+          for: 2m
+          labels:
+            severity: critical
+            namespace: fooddelivery
+            slo: availability
+          annotations:
+            summary: "Availability SLO fast-burn — error budget exhausting quickly"
+            description: >
+              Availability has dropped to {{ $value | printf "%.2f" }} over the last 5 minutes.
+              At this rate the monthly 99% SLO budget will be exhausted in < 1 hour.
+            runbook: "kubectl get pods -n fooddelivery; kubectl top pods -n fooddelivery"
+
+        # Alert: SLO burn rate elevated (slow burn — 30m window, 3× budget consumed)
+        - alert: FoodDeliverySLOSlowBurn
+          expr: |
+            (1 - job:fooddelivery_availability_30m:ratio) > (3 * (1 - 0.99))
+          for: 15m
+          labels:
+            severity: warning
+            namespace: fooddelivery
+            slo: availability
+          annotations:
+            summary: "Availability SLO slow-burn — error budget draining"
+            description: >
+              Availability has averaged {{ $value | printf "%.2f" }} over the last 30 minutes.
+              This steady-state degradation will exhaust the monthly SLO budget.
+            runbook: "kubectl describe hpa -n fooddelivery; kubectl get events -n fooddelivery"
+
+    # ──────────────────────────────────────────────────────────────────────────
+    # SLO 2 — Saturation (CPU < 80% of limit, Memory < 80% of limit)
+    #   SLI: aggregate CPU / memory utilisation as a fraction of resource limits.
+    # ──────────────────────────────────────────────────────────────────────────
+    - name: fooddelivery.slo.saturation
+      interval: 60s
+      rules:
+        # Aggregate CPU saturation ratio (0–1)
+        - record: job:fooddelivery_cpu_saturation:ratio
+          expr: |
+            sum(
+              rate(container_cpu_usage_seconds_total{
+                namespace="fooddelivery",
+                container!="",
+                container!="POD"
+              }[5m])
+            )
+            /
+            sum(
+              kube_pod_container_resource_limits{
+                namespace="fooddelivery",
+                resource="cpu",
+                container!=""
+              }
+            )
+
+        # Per-container CPU saturation ratio
+        - record: job:fooddelivery_cpu_saturation_per_container:ratio
+          expr: |
+            sum(
+              rate(container_cpu_usage_seconds_total{
+                namespace="fooddelivery",
+                container!="",
+                container!="POD"
+              }[5m])
+            ) by (container)
+            /
+            sum(
+              kube_pod_container_resource_limits{
+                namespace="fooddelivery",
+                resource="cpu",
+                container!=""
+              }
+            ) by (container)
+
+        # Aggregate memory saturation ratio (0–1)
+        - record: job:fooddelivery_memory_saturation:ratio
+          expr: |
+            sum(
+              container_memory_working_set_bytes{
+                namespace="fooddelivery",
+                container!="",
+                container!="POD"
+              }
+            )
+            /
+            sum(
+              kube_pod_container_resource_limits{
+                namespace="fooddelivery",
+                resource="memory",
+                container!=""
+              }
+            )
+
+        # Per-container memory saturation ratio
+        - record: job:fooddelivery_memory_saturation_per_container:ratio
+          expr: |
+            sum(
+              container_memory_working_set_bytes{
+                namespace="fooddelivery",
+                container!="",
+                container!="POD"
+              }
+            ) by (container)
+            /
+            sum(
+              kube_pod_container_resource_limits{
+                namespace="fooddelivery",
+                resource="memory",
+                container!=""
+              }
+            ) by (container)
+
+    # ──────────────────────────────────────────────────────────────────────────
+    # SLO 3 — Error Rate (pod restarts as proxy, target < 0.1/min aggregate)
+    #   SLI: container restart rate (restarts/min) and pod running ratio.
+    #   Note: replace with HTTP 5xx ratio once the api-gateway exports
+    #         http_requests_total{status=~"5.."} from its /metrics endpoint.
+    # ──────────────────────────────────────────────────────────────────────────
+    - name: fooddelivery.slo.errors
+      interval: 30s
+      rules:
+        # Aggregate restart rate in restarts per minute
+        - record: job:fooddelivery_restart_rate:per_minute
+          expr: |
+            sum(
+              rate(kube_pod_container_status_restarts_total{namespace="fooddelivery"}[5m])
+            ) * 60
+
+        # Ratio of Running pods to all scheduled pods (0–1)
+        - record: job:fooddelivery_pod_running:ratio
+          expr: |
+            count(kube_pod_status_phase{namespace="fooddelivery", phase="Running"} == 1)
+            /
+            count(kube_pod_info{namespace="fooddelivery"})
+
+        # HPA headroom: distance from current to max replicas (per HPA)
+        - record: job:fooddelivery_hpa_headroom:pods
+          expr: |
+            kube_horizontalpodautoscaler_spec_max_replicas{namespace="fooddelivery"}
+            - kube_horizontalpodautoscaler_status_current_replicas{namespace="fooddelivery"}
