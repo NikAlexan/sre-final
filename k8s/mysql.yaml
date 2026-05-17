@@ -1,39 +1,42 @@
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: postgres
+  name: mysql
   namespace: ecommerce
 spec:
-  serviceName: postgres
+  serviceName: mysql
   replicas: 1
   selector:
     matchLabels:
-      app: postgres
+      app: mysql
   template:
     metadata:
       labels:
-        app: postgres
+        app: mysql
     spec:
       containers:
-        - name: postgres
-          image: postgres:15-alpine
+        - name: mysql
+          image: mysql:8.0
           ports:
-            - containerPort: 5432
+            - containerPort: 3306
           env:
-            - name: PGDATA
-              value: /var/lib/postgresql/data/pgdata
-            - name: POSTGRES_DB
+            - name: MYSQL_DATABASE
               value: ecommerce
-            - name: POSTGRES_USER
+            - name: MYSQL_USER
               value: prestashop
-            - name: POSTGRES_PASSWORD
+            - name: MYSQL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: prestashop-secret
+                  key: db-password
+            - name: MYSQL_ROOT_PASSWORD
               valueFrom:
                 secretKeyRef:
                   name: prestashop-secret
                   key: db-password
           volumeMounts:
             - name: data
-              mountPath: /var/lib/postgresql/data
+              mountPath: /var/lib/mysql
   volumeClaimTemplates:
     - metadata:
         name: data
@@ -46,10 +49,10 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: postgres
+  name: mysql
   namespace: ecommerce
 spec:
   selector:
-    app: postgres
+    app: mysql
   ports:
-    - port: 5432
+    - port: 3306
