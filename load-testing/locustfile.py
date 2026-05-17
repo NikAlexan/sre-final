@@ -32,7 +32,7 @@ def _rand_email() -> str:
 class FoodDeliveryUser(HttpUser):
     """Simulates an anonymous + authenticated food delivery customer."""
 
-    wait_time = between(0.5, 2.0)
+    wait_time = between(0.05, 0.2)
 
     # JWT token obtained after login (None until login() runs)
     _token: str | None = None
