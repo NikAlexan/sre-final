@@ -7,3 +7,4 @@ terraform/terraform.tfstate.backup
 terraform/*.tfplan
 Final.pdf
 terraform/.env
+k8s/secrets.yaml

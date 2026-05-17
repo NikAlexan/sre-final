@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: prestashop
+  namespace: ecommerce
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: prestashop
+  template:
+    metadata:
+      labels:
+        app: prestashop
+    spec:
+      containers:
+        - name: prestashop
+          image: ghcr.io/nikalexan/sre-final/prestashop:latest
+          ports:
+            - containerPort: 8080
+          env:
+            - name: PRESTASHOP_DATABASE_HOST
+              value: postgres
+            - name: PRESTASHOP_DATABASE_PORT_NUMBER
+              value: "5432"
+            - name: PRESTASHOP_DATABASE_NAME
+              value: ecommerce
+            - name: PRESTASHOP_DATABASE_USER
+              value: prestashop
+            - name: PRESTASHOP_DATABASE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: prestashop-secret
+                  key: db-password
+            - name: PRESTASHOP_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: prestashop-secret
+                  key: prestashop-password
+          resources:
+            requests:
+              cpu: 250m
+              memory: 512Mi
+            limits:
+              cpu: 500m
+              memory: 1Gi
