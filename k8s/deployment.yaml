@@ -17,7 +17,7 @@ spec:
         - name: prestashop
           image: ghcr.io/nikalexan/sre-final/prestashop:latest
           ports:
-            - containerPort: 8080
+            - containerPort: 80
           env:
             - name: DB_SERVER
               value: postgres
