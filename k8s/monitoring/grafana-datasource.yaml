@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: fooddelivery-prometheus-datasource
+  namespace: kube-prometheus-stack
+  labels:
+    grafana_datasource: "1"
+data:
+  datasource.yaml: |
+    apiVersion: 1
+    datasources:
+      - name: Prometheus-Ingress
+        type: prometheus
+        uid: prometheus-ingress
+        url: https://prometheus.nikalexan.com
+        access: proxy
+        isDefault: false
+        editable: false
+        jsonData:
+          timeInterval: 30s
