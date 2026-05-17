@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: fooddelivery-config
+  namespace: fooddelivery
+data:
+  REDIS_ADDR: "redis:6379"
+  NATS_URL: "nats://nats:4222"
+  USER_SERVICE_ADDR: "user-service:50051"
+  RESTAURANT_SERVICE_ADDR: "restaurant-service:50052"
+  ORDER_SERVICE_ADDR: "order-service:50053"
+  DELIVERY_SERVICE_ADDR: "delivery-service:50054"
+  SMTP_HOST: "mailhog"
+  SMTP_PORT: "1025"
+  EMAIL_FROM: "no-reply@nikalexan.com"
