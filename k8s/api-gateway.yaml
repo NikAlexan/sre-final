@@ -12,6 +12,10 @@ spec:
     metadata:
       labels:
         app: api-gateway
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8080"
+        prometheus.io/path: "/metrics"
     spec:
       containers:
         - name: api-gateway
@@ -70,5 +74,6 @@ spec:
   selector:
     app: api-gateway
   ports:
-    - port: 80
+    - name: http
+      port: 80
       targetPort: 8080

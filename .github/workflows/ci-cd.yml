@@ -31,6 +31,7 @@ jobs:
         run: |
           kubectl apply -f k8s/namespace.yaml
           kubectl apply -f k8s/
+          kubectl apply -f k8s/monitoring/
 
       - name: Update images
         env:
