@@ -32,6 +32,8 @@ spec:
                 secretKeyRef:
                   name: prestashop-secret
                   key: db-password
+            - name: PS_DOMAIN
+              value: "shop.nikalexan.com"
             - name: PS_FOLDER_ADMIN
               value: admin1
             - name: ADMIN_PASSWD
