@@ -46,6 +46,8 @@ jobs:
             order-service=${{ env.REGISTRY }}/order-service:${SHA} -n fooddelivery
           kubectl set image deployment/delivery-service \
             delivery-service=${{ env.REGISTRY }}/delivery-service:${SHA} -n fooddelivery
+          kubectl set image deployment/frontend \
+            frontend=${{ env.REGISTRY }}/frontend:${SHA} -n fooddelivery || true
 
       - name: Verify rollout
         run: kubectl rollout status deployment/api-gateway -n fooddelivery --timeout=120s || true
