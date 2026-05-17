@@ -62,4 +62,4 @@ jobs:
             -n ecommerce
 
       - name: Wait for rollout
-        run: kubectl rollout status deployment/prestashop -n ecommerce --timeout=120s
+        run: kubectl rollout status deployment/prestashop -n ecommerce --timeout=300s

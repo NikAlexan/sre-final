@@ -39,6 +39,13 @@ spec:
                 secretKeyRef:
                   name: prestashop-secret
                   key: prestashop-password
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 80
+            initialDelaySeconds: 120
+            periodSeconds: 15
+            failureThreshold: 10
           resources:
             requests:
               cpu: 250m
