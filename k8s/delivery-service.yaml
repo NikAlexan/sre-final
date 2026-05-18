@@ -13,6 +13,16 @@ spec:
       labels:
         app: delivery-service
     spec:
+      initContainers:
+        - name: migrate
+          image: ghcr.io/nikalexan/food-delivery-project-go/delivery-service:latest
+          command: ["sh", "-c", "./goose -dir migrations postgres \"$DATABASE_URL\" up"]
+          env:
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: fooddelivery-secret
+                  key: DATABASE_URL_DELIVERY
       containers:
         - name: delivery-service
           image: ghcr.io/nikalexan/food-delivery-project-go/delivery-service:latest
