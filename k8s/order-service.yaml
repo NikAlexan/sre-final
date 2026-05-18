@@ -16,7 +16,7 @@ spec:
       initContainers:
         - name: migrate
           image: ghcr.io/nikalexan/food-delivery-project-go/order-service:latest
-          command: ["sh", "-c", "./goose -dir migrations postgres \"$DATABASE_URL\" up"]
+          command: ["sh", "-c", "until nc -z postgres-order 5432; do echo waiting for postgres; sleep 2; done && ./goose -dir migrations postgres \"$DATABASE_URL\" up"]
           env:
             - name: DATABASE_URL
               valueFrom:
