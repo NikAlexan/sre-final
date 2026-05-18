@@ -61,6 +61,16 @@ spec:
                 configMapKeyRef:
                   name: fooddelivery-config
                   key: EMAIL_FROM
+            - name: SMTP_USER
+              valueFrom:
+                secretKeyRef:
+                  name: fooddelivery-secret
+                  key: SMTP_USER
+            - name: SMTP_PASS
+              valueFrom:
+                secretKeyRef:
+                  name: fooddelivery-secret
+                  key: SMTP_PASS
           readinessProbe:
             tcpSocket:
               port: 50054
